@@ -1,7 +1,9 @@
 import sys
 from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QCheckBox,
                              QListWidget, QFileDialog, QMessageBox)
+from PyQt5.QtGui import QIcon
 from pytube import YouTube
+import qdarkstyle
 
 
 class YouTubeDownloader(QWidget):
@@ -35,14 +37,14 @@ class YouTubeDownloader(QWidget):
         # URL Entry
         url_layout = QHBoxLayout()
         self.url_entry = QLineEdit(self)
-        url_layout.addWidget(QLabel("URL de la vidéo:"))
+        url_layout.addWidget(QLabel("URL:"))
         url_layout.addWidget(self.url_entry)
         layout.addLayout(url_layout)
 
         # Checkboxes for video and audio streams
-        self.video_check = QCheckBox("Flux vidéo", self)
+        self.video_check = QCheckBox("Video streams", self)
         self.video_check.setChecked(True)
-        self.audio_check = QCheckBox("Flux audio", self)
+        self.audio_check = QCheckBox("Audio streams", self)
         self.audio_check.setChecked(True)
         layout.addWidget(self.video_check)
         layout.addWidget(self.audio_check)
@@ -57,14 +59,16 @@ class YouTubeDownloader(QWidget):
         layout.addWidget(self.stream_list)
 
         # Button to download selected stream
-        self.download_button = QPushButton("Download flux", self)
+        self.download_button = QPushButton("Download", self)
         self.download_button.clicked.connect(self.download_stream)
         layout.addWidget(self.download_button)
 
         # Set layout
         self.setLayout(layout)
         self.setWindowTitle("Youtube Downloader")
-        self.setGeometry(300, 300, 600, 400)
+        self.setGeometry(300, 300, 400, 400)
+
+        self.setWindowIcon(QIcon('assets/shuba-duck-dance-pixel-pixelated.ico'))
 
     def load_streams(self):
         url = self.url_entry.text()
@@ -100,8 +104,10 @@ class YouTubeDownloader(QWidget):
                 QMessageBox.information(self, "Success", "Download completed")
 
 
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
     ex = YouTubeDownloader()
     ex.show()
     sys.exit(app.exec_())
