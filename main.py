@@ -11,13 +11,14 @@ class YouTubeDownloader(QWidget):
     Main window of the application
 
     Attributes:
-        load_button (QPushButton): Button to load streams
-        stream_list (QListWidget): List of available streams
-        download_button (QPushButton): Button to download selected stream
-        audio_check (QCheckBox): Checkbox to select audio streams
-        video_check (QCheckBox): Checkbox to select video streams
-        url_entry (QLineEdit): Entry to input the video URL
-        stream_dict (dict): Dictionary to store stream information
+        load_button: Button to load streams
+        stream_list: ListWidget to display available streams
+        download_button: Button to download selected stream
+        audio_check: Checkbox to select audio streams
+        video_check: Checkbox to select video streams
+        url_entry: QLineEdit to input URL
+        stream_dict: Dictionary to store stream objects
+        video_title: Title of the video being downloaded
     """
     def __init__(self):
         super().__init__()
@@ -28,6 +29,8 @@ class YouTubeDownloader(QWidget):
         self.video_check = None
         self.url_entry = None
         self.stream_dict = None
+        self.video_title = None  
+        self.author = None  
         self.init_ui()
 
     def init_ui(self):
@@ -74,9 +77,10 @@ class YouTubeDownloader(QWidget):
         url = self.url_entry.text()
         try:
             yt = YouTube(url)
+            self.video_title = yt.title
+            self.author = yt.author
             self.stream_list.clear()
             self.stream_dict = {}
-
             if self.video_check.isChecked():
                 video_streams = yt.streams.filter(progressive=True, file_extension='mp4')
                 for stream in video_streams:
@@ -100,7 +104,7 @@ class YouTubeDownloader(QWidget):
             stream = self.stream_dict[stream_info]
             save_path = QFileDialog.getExistingDirectory(self, "Select Directory")
             if save_path:
-                stream.download(save_path)
+                stream.download(save_path, filename=f"{self.video_title} {self.author}.mp4")
                 QMessageBox.information(self, "Success", "Download completed")
 
 
