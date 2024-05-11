@@ -1,72 +1,107 @@
-import tkinter as tk
-from tkinter import ttk, filedialog
+import sys
+from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QCheckBox,
+                             QListWidget, QFileDialog, QMessageBox)
 from pytube import YouTube
-from tkinter import messagebox
 
-def load_streams():
-    url = url_entry.get()
-    try:
-        yt = YouTube(url)
-        stream_list.delete(0, tk.END)
-        stream_dict.clear()
 
-        if video_check.get():  # Si l'utilisateur souhaite les flux vidéo
-            video_streams = yt.streams.filter(progressive=True, file_extension='mp4')
-            for stream in video_streams:
-                stream_info = f"Video {stream.itag} - {stream.resolution} - {stream.mime_type}"
-                stream_list.insert(tk.END, stream_info)
-                stream_dict[stream_info] = stream
+class YouTubeDownloader(QWidget):
+    """
+    Main window of the application
 
-        if audio_check.get():  # Si l'utilisateur souhaite les flux audio
-            audio_streams = yt.streams.filter(only_audio=True)
-            for stream in audio_streams:
-                stream_info = f"Audio {stream.itag} - {stream.abr} - {stream.mime_type}"
-                stream_list.insert(tk.END, stream_info)
-                stream_dict[stream_info] = stream
+    Attributes:
+        load_button (QPushButton): Button to load streams
+        stream_list (QListWidget): List of available streams
+        download_button (QPushButton): Button to download selected stream
+        audio_check (QCheckBox): Checkbox to select audio streams
+        video_check (QCheckBox): Checkbox to select video streams
+        url_entry (QLineEdit): Entry to input the video URL
+        stream_dict (dict): Dictionary to store stream information
+    """
+    def __init__(self):
+        super().__init__()
+        self.load_button = None
+        self.stream_list = None
+        self.download_button = None
+        self.audio_check = None
+        self.video_check = None
+        self.url_entry = None
+        self.stream_dict = None
+        self.init_ui()
 
-    except Exception as e:
-        messagebox.showerror("Erreur", str(e))
+    def init_ui(self):
+        # Layout principal
+        layout = QVBoxLayout()
 
-def download_stream():
-    selection = stream_list.curselection()
-    if not selection:
-        messagebox.showerror("Erreur", "Veuillez sélectionner un format")
-        return
-    stream_info = stream_list.get(selection[0])
-    stream = stream_dict[stream_info]
-    save_path = filedialog.askdirectory()
-    if save_path:
-        stream.download(save_path)
-        messagebox.showinfo("Succès", "Téléchargement terminé")
+        # URL Entry
+        url_layout = QHBoxLayout()
+        self.url_entry = QLineEdit(self)
+        url_layout.addWidget(QLabel("URL de la vidéo:"))
+        url_layout.addWidget(self.url_entry)
+        layout.addLayout(url_layout)
 
-app = tk.Tk()
-app.title("Téléchargeur YouTube")
+        # Checkboxes for video and audio streams
+        self.video_check = QCheckBox("Flux vidéo", self)
+        self.video_check.setChecked(True)
+        self.audio_check = QCheckBox("Flux audio", self)
+        self.audio_check.setChecked(True)
+        layout.addWidget(self.video_check)
+        layout.addWidget(self.audio_check)
 
-style = ttk.Style()
-style.theme_use('clam')
+        # Button to load streams
+        self.load_button = QPushButton("Load streams", self)
+        self.load_button.clicked.connect(self.load_streams)
+        layout.addWidget(self.load_button)
 
-tk.Label(app, text="URL de la vidéo:").pack(pady=10)
-url_entry = ttk.Entry(app, width=50)
-url_entry.pack(pady=10)
+        # ListWidget to display available streams
+        self.stream_list = QListWidget(self)
+        layout.addWidget(self.stream_list)
 
-# Cases à cocher pour les options de téléchargement
-video_check = tk.BooleanVar()
-video_check.set(True)  # Par défaut, coché
-audio_check = tk.BooleanVar()
-audio_check.set(True)  # Par défaut, coché
-ttk.Checkbutton(app, text="Flux vidéo", variable=video_check).pack()
-ttk.Checkbutton(app, text="Flux audio", variable=audio_check).pack()
+        # Button to download selected stream
+        self.download_button = QPushButton("Download flux", self)
+        self.download_button.clicked.connect(self.download_stream)
+        layout.addWidget(self.download_button)
 
-load_button = ttk.Button(app, text="Charger les flux", command=load_streams)
-load_button.pack(pady=10)
+        # Set layout
+        self.setLayout(layout)
+        self.setWindowTitle("Youtube Downloader")
+        self.setGeometry(300, 300, 600, 400)
 
-tk.Label(app, text="Choisir le format de flux:").pack()
-stream_list = tk.Listbox(app, width=50)
-stream_list.pack(pady=10)
+    def load_streams(self):
+        url = self.url_entry.text()
+        try:
+            yt = YouTube(url)
+            self.stream_list.clear()
+            self.stream_dict = {}
 
-download_button = ttk.Button(app, text="Télécharger le flux", command=download_stream)
-download_button.pack(pady=10)
+            if self.video_check.isChecked():
+                video_streams = yt.streams.filter(progressive=True, file_extension='mp4')
+                for stream in video_streams:
+                    stream_info = f"Video {stream.itag} - {stream.resolution} - {stream.mime_type}"
+                    self.stream_list.addItem(stream_info)
+                    self.stream_dict[stream_info] = stream
 
-stream_dict = {}
+            if self.audio_check.isChecked():
+                audio_streams = yt.streams.filter(only_audio=True)
+                for stream in audio_streams:
+                    stream_info = f"Audio {stream.itag} - {stream.abr} - {stream.mime_type}"
+                    self.stream_list.addItem(stream_info)
+                    self.stream_dict[stream_info] = stream
 
-app.mainloop()
+        except Exception as e:
+            QMessageBox.critical(self, "Error", str(e))
+
+    def download_stream(self):
+        stream_info = self.stream_list.currentItem().text()
+        if stream_info:
+            stream = self.stream_dict[stream_info]
+            save_path = QFileDialog.getExistingDirectory(self, "Select Directory")
+            if save_path:
+                stream.download(save_path)
+                QMessageBox.information(self, "Success", "Download completed")
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    ex = YouTubeDownloader()
+    ex.show()
+    sys.exit(app.exec_())
