@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ytdl"
+version = "2.0.0"
+description = "Téléchargeur vidéo/audio moderne (NiceGUI + yt-dlp) — web ou fenêtre native."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Jean-Loup Caillet" }]
+dependencies = [
+    "nicegui[highcharts]>=2.0",
+    "yt-dlp>=2024.0",
+    "pywebview>=5.0",
+    "mutagen>=1.47",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+ytdl = "ytdl.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["ytdl*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "network: tests nécessitant un accès réseau réel (désactivés par défaut).",
+]
+addopts = "-m 'not network'"

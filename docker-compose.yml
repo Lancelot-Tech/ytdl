@@ -1,0 +1,13 @@
+services:
+  ytdl:
+    build: .
+    image: ytdl:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./downloads:/downloads
+      - ytdl-config:/config
+    restart: unless-stopped
+
+volumes:
+  ytdl-config:

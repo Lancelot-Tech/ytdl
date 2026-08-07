@@ -1,4 +1,14 @@
-PyQt5
-pytube
-qdarkstyle
-pyinstaller
+# Runtime
+nicegui[highcharts]>=2.0  # [highcharts] pour les graphes de l'accueil natif (licence Highcharts :
+                          # gratuite en usage personnel/non commercial, https://www.highcharts.com/license)
+yt-dlp>=2024.0
+pywebview>=5.0        # mode fenêtre native (python -m ytdl --native)
+mutagen>=1.47          # incorporation de miniature en pochette (m4a/mp4/ogg/opus/flac) ;
+                        # sans lui, yt-dlp retombe sur un fallback ffmpeg qui échoue et
+                        # laisse des fichiers image orphelins à côté du média
+
+# Dev / tests
+pytest>=8.0
+
+# Build (optionnel) : générer un exécutable autonome
+pyinstaller>=6.0

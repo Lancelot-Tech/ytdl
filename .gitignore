@@ -1,2 +1,25 @@
+# Environnements
 .venv
 .idea
+.vscode
+.DS_Store
+
+# Template de référence design (Astro, hors périmètre de l'appli Python)
+portefolio/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Build
+build/
+dist/
+*.spec
+
+# Médias téléchargés (au cas où le dossier de sortie serait dans le repo)
+*.mp4
+*.mp3
+*.m4a
+*.webm

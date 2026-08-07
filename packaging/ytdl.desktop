@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=ytdl
+Comment=Téléchargeur vidéo & audio (MP4, MP3, playlists)
+Exec=ytdl
+Icon=ytdl
+Categories=AudioVideo;Network;
+Terminal=false

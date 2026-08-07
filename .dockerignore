@@ -1,0 +1,16 @@
+.venv
+.git
+.github
+.idea
+.vscode
+.pytest_cache
+__pycache__
+*.py[cod]
+*.egg-info
+portefolio/
+tests/
+dist/
+build/
+*.spec
+.DS_Store
+.claude
